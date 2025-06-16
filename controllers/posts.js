@@ -22,23 +22,44 @@ export const getSinglePost = async (req, res) => {
   res.send(post);
 };
 
-export const updatePost = async (req, res) => {
+export const updatePost = async (req, res, next) => {
   const {
-    sanitizedBody,
-    params: { id }
+    sanitizedBody: { image, title, content },
+    params: { id },
+    userId
   } = req;
+
   if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
-  const updatedPost = await Post.findByIdAndUpdate(id, sanitizedBody, { new: true }).populate('author');
-  if (!updatedPost) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
-  res.json(updatedPost);
+  const postInDatabase = await Post.findById(id);
+
+  if (!postInDatabase) throw new Error(`Post with id of${id} doesn't exist`);
+
+  if (userId !== postInDatabase.author.toString()) {
+    throw new Error('Not authorized', { cause: 403 });
+  }
+  postInDatabase.title = title;
+  postInDatabase.image = image;
+  postInDatabase.content = content;
+
+  await postInDatabase.save();
+
+  res.json(postInDatabase);
 };
 
 export const deletePost = async (req, res) => {
   const {
-    params: { id }
+    params: { id },
+    userId
   } = req;
   if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
-  const deletedPost = await Post.findByIdAndDelete(id).populate('author');
-  if (!deletedPost) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
+
+  const postInDatabase = await Post.findById(id);
+
+  if (!postInDatabase) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
+
+  if (userId !== postInDatabase.author.toString()) throw new Error('Not Authorized', { cause: 403 });
+
+  await Post.findByIdAndDelete(id);
+
   res.json({ success: `Post with id of ${id} was deleted` });
 };

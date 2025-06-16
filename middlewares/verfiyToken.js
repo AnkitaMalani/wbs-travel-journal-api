@@ -6,16 +6,16 @@ const verifyToken = (req, res, next) => {
   }
 
   const cookies = req.headers.cookie.split('; ');
-  console.log(cookies);
+  //console.log(cookies);
 
   const cookieArrays = cookies.map(cookie => cookie.split('='));
-  console.log(cookieArrays);
+  //console.log(cookieArrays);
 
   const cookieObj = Object.fromEntries(cookieArrays);
-  console.log(cookieObj);
+  //console.log(cookieObj);
 
   const token = cookieObj.token;
-  console.log(token);
+  //console.log(token);
 
   if (!token) {
     next(new Error('Unauthorized, please sign in', { cause: 401 }));
