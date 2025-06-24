@@ -69,4 +69,4 @@ const signOut = async (req, res) => {
   res.json({ message: 'You have signed out' });
 };
 
-export { signUp, signIn, me,signOut };
+export { signUp, signIn, me, signOut };

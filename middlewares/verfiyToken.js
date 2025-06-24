@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
   const cookieObj = Object.fromEntries(cookieArrays);
   //console.log(cookieObj);
 
-  const token = cookieObj.token;
+  const {token} = cookieObj;
   //console.log(token);
 
   if (!token) {
