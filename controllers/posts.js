@@ -22,11 +22,12 @@ export const getSinglePost = async (req, res) => {
   res.send(post);
 };
 
-export const updatePost = async (req, res, next) => {
+export const updatePost = async (req, res) => {
   const {
     sanitizedBody: { image, title, content },
     params: { id },
-    userId
+    userId,
+    userRole
   } = req;
 
   if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
@@ -34,7 +35,7 @@ export const updatePost = async (req, res, next) => {
 
   if (!postInDatabase) throw new Error(`Post with id of${id} doesn't exist`);
 
-  if (userId !== postInDatabase.author.toString()) {
+  if (userId !== postInDatabase.author.toString() && userRole !== 'admin') {
     throw new Error('Not authorized', { cause: 403 });
   }
   postInDatabase.title = title;
@@ -49,7 +50,8 @@ export const updatePost = async (req, res, next) => {
 export const deletePost = async (req, res) => {
   const {
     params: { id },
-    userId
+    userId,
+    userRole
   } = req;
   if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
 
@@ -57,7 +59,7 @@ export const deletePost = async (req, res) => {
 
   if (!postInDatabase) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
 
-  if (userId !== postInDatabase.author.toString()) throw new Error('Not Authorized', { cause: 403 });
+  if (userId !== postInDatabase.author.toString() && userRole !== 'admin') throw new Error('Not Authorized', { cause: 403 });
 
   await Post.findByIdAndDelete(id);
 

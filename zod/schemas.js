@@ -1,10 +1,11 @@
 import { z } from 'zod/v4';
-
+ 
 export const userSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string(),
-  password: z.string().min(8).max(12)
+  password: z.string().min(8).max(12),
+  role:z.enum(['admin','user']).default('user')
 });
 
 export const signInSchema = userSchema.omit({ firstName: true, lastName: true });

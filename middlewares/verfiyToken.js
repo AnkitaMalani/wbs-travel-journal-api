@@ -20,9 +20,10 @@ const verifyToken = (req, res, next) => {
   if (!token) {
     next(new Error('Unauthorized, please sign in', { cause: 401 }));
   }
-  const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+  const { userId,userRole } = jwt.verify(token, process.env.JWT_SECRET);
 
   req.userId = userId;
+  req.userRole = userRole;
 
   next();
 };
